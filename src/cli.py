@@ -125,7 +125,15 @@ def cmd_next(args) -> None:
                  if s not in have]
     if not remaining:
         t = spec.totals
-        print(f"남은 작업이 없다. 이미지 {t['images']}장 · 영상 {t['videos']}개 전부 완료.")
+        if args.kind == "image":
+            left = [x for x, _, _ in _planned(spec, "video") if x not in have]
+            print(f"이미지 {t['images']}장 완료.")
+            print(f"다음 단계: Flow Omni에서 영상 {len(left)}개."
+                  if left else f"영상 {t['videos']}개도 완료. 전부 끝났다.")
+        elif args.kind == "video":
+            print(f"영상 {t['videos']}개 완료.")
+        else:
+            print(f"전부 완료. 이미지 {t['images']}장 · 영상 {t['videos']}개.")
         return
     print(f"남은 작업 {len(remaining)}개. 다음 {min(args.count, len(remaining))}개:\n")
     for stem, kind, prompt in remaining[:args.count]:
