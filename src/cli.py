@@ -73,6 +73,8 @@ def cmd_build(args) -> None:
     made.append((outdir / "매니페스트.csv", f"{n}행"))
     n = render.queue(spec, outdir / "대기열_이미지.tsv", mode)
     made.append((outdir / "대기열_이미지.tsv", f"{n}행"))
+    n = render.webapp(spec, outdir / "작업대.html")
+    made.append((outdir / "작업대.html", f"{n // 1024}KB"))
 
     for path, note in made:
         print(f"  생성  {path}  ({note})")

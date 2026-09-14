@@ -1,0 +1,429 @@
+<title>거북선 컷 작업대</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --hanji:#f4efe3; --surface:#fbf8f1; --surface-2:#ece5d5;
+  --ink:#16202e; --text:#16202e; --dim:#5f6a79; --faint:#8b93a0;
+  --sea:#2d4263; --sea-soft:#5a7396;
+  --ember:#b5622a; --ember-ink:#8d4a1f; --ember-wash:#f6e6d6;
+  --done:#4a7c59; --done-wash:#e2ecdf;
+  --line:#d8cfb8; --line-soft:#e6ddc8;
+  --bg:var(--hanji); --on-sea:#fbf8f1; --btn-bg:#2d4263; --btn-fg:#fbf8f1;
+  --shadow:0 1px 2px rgba(22,32,46,.06),0 8px 24px -12px rgba(22,32,46,.18);
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --hanji:#121821; --surface:#1a222d; --surface-2:#222c39;
+    --ink:#e9e3d5; --text:#e9e3d5; --dim:#9aa4b2; --faint:#6f7b8a;
+    --sea:#7d96ba; --sea-soft:#5a7396;
+    --ember:#dd9257; --ember-ink:#e8a870; --ember-wash:#33251a;
+    --done:#7fae8c; --done-wash:#1e2a22;
+    --line:#2d3947; --line-soft:#242e3a;
+    --on-sea:#121821; --btn-bg:#93aacb; --btn-fg:#101620;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --hanji:#121821; --surface:#1a222d; --surface-2:#222c39;
+  --ink:#e9e3d5; --text:#e9e3d5; --dim:#9aa4b2; --faint:#6f7b8a;
+  --sea:#7d96ba; --sea-soft:#5a7396;
+  --ember:#dd9257; --ember-ink:#e8a870; --ember-wash:#33251a;
+  --done:#7fae8c; --done-wash:#1e2a22;
+  --line:#2d3947; --line-soft:#242e3a; --on-sea:#121821; --btn-bg:#93aacb; --btn-fg:#101620;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"IBM Plex Sans KR",system-ui,-apple-system,sans-serif;
+  font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Nanum Myeongjo",Georgia,serif;text-wrap:balance;margin:0}
+code,kbd,.mono{font-family:"IBM Plex Mono","IBM Plex Sans KR",ui-monospace,monospace}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--ember);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px}
+
+/* ── 상단 제어줄 ─────────────────────────── */
+header{
+  position:sticky;top:0;z-index:20;background:var(--surface);
+  border-bottom:1px solid var(--line);
+}
+.bar{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding-block:14px 10px}
+.bar h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.bar .sub{font-size:12.5px;color:var(--dim)}
+.meter{height:5px;background:var(--surface-2);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.meter i{display:block;height:100%;background:var(--done);width:0;transition:width .3s}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding-bottom:14px}
+.seg{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.seg button{padding:6px 13px;font-size:13px;color:var(--dim);background:var(--surface)}
+.seg button[aria-pressed="true"]{background:var(--sea);color:var(--on-sea);font-weight:500}
+.field{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:var(--r);padding:4px 10px;background:var(--surface)}
+.field label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:500}
+.field input{border:0;background:none;font:14px/1.4 "IBM Plex Mono",monospace;color:var(--text);width:112px;padding:3px 0}
+.field input:focus{outline:none}
+.ghost{font-size:12.5px;color:var(--dim);padding:6px 11px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.ghost:hover{border-color:var(--sea-soft);color:var(--text)}
+
+/* ── 다음 작업 카드 ───────────────────────── */
+.now{
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);margin-block:22px;overflow:hidden;
+}
+.now-top{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;padding:18px 20px 0}
+.now-eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.now-name{font-family:"IBM Plex Mono","IBM Plex Sans KR",monospace;font-size:26px;font-weight:500;letter-spacing:-.02em;margin-top:2px;word-break:break-all}
+.now-where{font-size:13.5px;color:var(--dim);margin-top:5px}
+.now-where b{font-weight:500;color:var(--text)}
+.now-side{margin-left:auto;text-align:right;min-width:120px}
+.prompt{
+  position:relative;
+  margin:16px 20px;padding:15px 16px;background:var(--bg);border:1px solid var(--line-soft);
+  border-radius:var(--r);font-family:"IBM Plex Mono","IBM Plex Sans KR",monospace;
+  font-size:12.5px;line-height:1.75;white-space:pre-wrap;word-break:break-word;
+  max-height:250px;overflow-y:auto;
+  mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);
+}
+.prompt::-webkit-scrollbar{width:8px}
+.prompt::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.prompt mark{background:var(--ember-wash);color:var(--ember-ink);padding:1px 4px;border-radius:3px;font-weight:500}
+.now-act{display:flex;gap:10px;flex-wrap:wrap;padding:0 20px 20px;align-items:center}
+.btn{padding:11px 20px;border-radius:var(--r);font-size:14px;font-weight:500;border:1px solid transparent}
+.btn-main{background:var(--btn-bg);color:var(--btn-fg)}
+.btn-main:hover{filter:brightness(.88)}
+.btn-2{background:var(--surface);border-color:var(--line);color:var(--text)}
+.btn-2:hover{border-color:var(--sea-soft)}
+.hint{font-size:12.5px;color:var(--dim)}
+
+/* ── 배지 ────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;
+  padding:3px 9px;border-radius:20px;letter-spacing:.01em;white-space:nowrap}
+.b-new{background:var(--ember-wash);color:var(--ember-ink);border:1px solid var(--ember)}
+.b-edit{background:var(--surface-2);color:var(--dim);border:1px solid var(--line)}
+.b-vid{background:var(--surface-2);color:var(--sea);border:1px solid var(--sea-soft)}
+
+/* ── 블록 목록 ───────────────────────────── */
+.blk{border-top:1px solid var(--line);padding-block:20px}
+.blk-h{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.blk-no{font-family:"Nanum Myeongjo",serif;font-size:27px;font-weight:800;color:var(--sea);
+  line-height:1;min-width:52px;font-variant-numeric:tabular-nums}
+.blk-t{font-family:"Nanum Myeongjo",serif;font-size:17px;font-weight:700;flex:1;min-width:200px}
+.blk-m{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.beat{margin-top:14px;padding-left:52px}
+@media(max-width:560px){.beat{padding-left:0}}
+.beat-h{font-size:12.5px;color:var(--dim);margin-bottom:7px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.beat-h b{font-weight:500;color:var(--text)}
+.cuts{display:flex;gap:7px;flex-wrap:wrap}
+.cut{
+  display:flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--surface);font-size:13px;
+  font-family:"IBM Plex Mono","IBM Plex Sans KR",monospace;transition:border-color .15s;
+}
+.cut:hover{border-color:var(--sea-soft)}
+.cut[data-done="1"]{background:var(--done-wash);border-color:var(--done);color:var(--done)}
+.cut[data-cur="1"]{border-color:var(--ember);border-width:2px;padding:5px 10px}
+.cut .dot{width:6px;height:6px;border-radius:50%;background:var(--ember);flex:none}
+.cut[data-done="1"] .dot{background:var(--done)}
+.cut.k1{border-left:3px solid var(--ember);padding-left:9px}
+.cut.k1[data-done="1"]{border-left-color:var(--done)}
+.cut.v{font-size:12px;color:var(--sea);border-style:dashed}
+.cut.v[data-done="1"]{color:var(--done)}
+
+.legend{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dim);margin:0 0 4px}
+.legend i{display:inline-block;width:3px;height:14px;background:var(--ember);border-radius:2px;flex:none}
+footer{border-top:1px solid var(--line);margin-top:30px;padding-block:22px 40px;font-size:12.5px;color:var(--dim)}
+footer p{margin:0 0 8px;max-width:62ch}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(70px);
+  background:var(--ink);color:var(--hanji);padding:10px 20px;border-radius:22px;
+  font-size:13.5px;font-weight:500;opacity:0;transition:.22s;pointer-events:none;z-index:50;
+}
+:root[data-theme="dark"] .toast{background:var(--surface-2);color:var(--text);border:1px solid var(--line)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+
+<header>
+  <div class="wrap">
+    <div class="bar">
+      <h1>거북선 컷 작업대</h1>
+      <span class="sub" id="tally"></span>
+    </div>
+    <div class="meter"><i id="meter"></i></div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="작업 단계">
+        <button id="st-img" aria-pressed="true">이미지</button>
+        <button id="st-vid" aria-pressed="false">영상</button>
+      </div>
+      <div class="seg" role="group" aria-label="프롬프트 문법">
+        <button id="md-nat" aria-pressed="true">나노바나나</button>
+        <button id="md-mj" aria-pressed="false">미드저니</button>
+      </div>
+      <div class="field">
+        <label for="seed">시드</label>
+        <input id="seed" placeholder="미입력" autocomplete="off" spellcheck="false">
+      </div>
+      <button class="ghost" id="exp">진행 내보내기</button>
+      <button class="ghost" id="imp">가져오기</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="now" id="now" aria-live="polite"></section>
+  <p class="legend" id="legend"></p>
+  <section id="list"></section>
+</main>
+
+<footer class="wrap">
+  <p><b>K1은 새 생성, K2부터는 같은 스레드에서 편집.</b> 비트가 바뀌면 다시 새 생성으로 돌아간다 — 장소가 다르기 때문이다. 카드의 배지가 매번 어느 쪽인지 알려준다.</p>
+  <p>16:9 · 1장 생성. 만든 즉시 카드에 적힌 이름 그대로 <code>E:\YouTube\국뽕\1.이순신</code>에 저장한다.</p>
+  <p>진행 상황은 이 브라우저에만 저장된다. 다른 PC에서 이어가려면 <b>진행 내보내기</b>로 받은 파일을 그쪽에서 <b>가져오기</b> 한다.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SPEC = /*__SPEC__*/{};
+const KEY = "geobukseon:" + SPEC.project;
+
+/* ── 프롬프트 조립 (src/prompts.py 와 동일 규칙) ─────────── */
+function framing(c){
+  if(c.ci===1) return null;
+  if(c.ci===c.n) return "the same scene from the same camera height, closest framing of this beat";
+  return `the same scene from the same camera height, progressively closer (${c.ci} of ${c.n})`;
+}
+function imageMJ(c){
+  const s=SPEC.scenes[c.code], props=SPEC.props.map(p=>p.ko).join(", ");
+  return `${framing(c)||s.desc}, ${s.shot}, ${SPEC.lights[c.light]}, ${SPEC.era.ko}, ${props}, `
+    +`[CAST], [LOCK] , [R-PAINT] , [STYLE] --ar ${SPEC.aspect} --sref [SEED] --sw ${SPEC.sref_weight} --no [FORBIDDEN]`;
+}
+function imageNatural(c){
+  const s=SPEC.scenes[c.code], props=SPEC.props.map(p=>p.en).join(", ");
+  const cast=SPEC.cast.map(x=>x.desc).join("; ");
+  return `${framing(c)||s.desc}, ${s.shot}, ${SPEC.lights[c.light]}. `
+    +`Setting: ${SPEC.era.en}. Recurring props that must appear consistently: ${props}. `
+    +`Characters (keep identical across every image): ${cast}. ${SPEC.cast_note_en} `
+    +`${SPEC.lock} ${SPEC.r_paint} ${SPEC.style} `
+    +`Render in a ${SPEC.aspect} landscape frame. Do not include: ${SPEC.forbidden}.`;
+}
+function videoPrompt(c){
+  const move = c.ci===1 ? SPEC.scenes[c.code].move : SPEC.video_continue;
+  return `${move} ${SPEC.video_tail}`;
+}
+
+/* ── 전체 작업 목록 펼치기 ───────────────────────────── */
+const CUTS=[];
+for(const b of SPEC.blocks){
+  const per=Math.round(b.seconds/b.beats.length);
+  b.beats.forEach(([code,n],i)=>{
+    for(let ci=1;ci<=n;ci++) CUTS.push({
+      block:b.no, title:b.title, light:b.light, tempo:b.tempo,
+      code, bi:i+1, name:SPEC.scenes[code].name, n, ci, sec:per
+    });
+  });
+}
+const stem=c=>`${c.block}블-b${c.bi}-k${c.ci}`;
+const vstem=c=>`${c.block}블-b${c.bi}-v${c.ci}`;
+
+function items(stage){
+  const out=[];
+  for(const c of CUTS){
+    if(stage==="image") out.push({cut:c,kind:"image",id:stem(c)+SPEC.image_ext});
+    else if(c.ci<c.n)   out.push({cut:c,kind:"video",id:vstem(c)+SPEC.video_ext});
+  }
+  return out;
+}
+
+/* ── 상태 ───────────────────────────────────────────── */
+let S={stage:"image",mode:"natural",seed:"",done:{}};
+try{ const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r)); }catch(e){}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+
+const esc=s=>s.replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+function withSeed(t){
+  return S.seed ? t.split("[SEED]").join(S.seed) : t;
+}
+function promptFor(it){
+  if(it.kind==="video") return videoPrompt(it.cut);
+  return withSeed(S.mode==="mj" ? imageMJ(it.cut) : imageNatural(it.cut));
+}
+
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("on");
+  clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("on"),1600);
+}
+async function copy(text,msg){
+  try{ await navigator.clipboard.writeText(text); }
+  catch(e){
+    const ta=document.createElement("textarea");
+    ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); }catch(_){ }
+    ta.remove();
+  }
+  toast(msg);
+}
+
+/* ── 그리기 ─────────────────────────────────────────── */
+function render(){
+  const list=items(S.stage);
+  const doneN=list.filter(i=>S.done[i.id]).length;
+  const cur=list.find(i=>!S.done[i.id]);
+
+  document.getElementById("meter").style.width=(doneN/list.length*100)+"%";
+  document.getElementById("tally").textContent=
+    `${S.stage==="image"?"이미지":"영상"} ${doneN} / ${list.length}` +
+    (doneN<list.length?` · 남은 ${list.length-doneN}개`:" · 완료");
+
+  /* 다음 작업 카드 */
+  const now=document.getElementById("now");
+  if(!cur){
+    const other=S.stage==="image"?"영상":"이미지";
+    now.innerHTML=`<div class="now-top"><div>
+      <div class="now-eyebrow">단계 완료</div>
+      <div class="now-name" style="font-family:'Nanum Myeongjo',serif">${S.stage==="image"?"이미지 "+list.length+"장 전부 만들었다":"영상 "+list.length+"개 전부 만들었다"}</div>
+      <p class="now-where">${S.stage==="image"?"이제 Flow Omni에서 컷 사이를 잇는다.":"모든 작업이 끝났다."}</p>
+      </div></div>
+      <div class="now-act"><button class="btn btn-main" onclick="setStage('${S.stage==="image"?"video":"image"}')">${other} 단계로</button></div>`;
+  }else{
+    const c=cur.cut, isVid=cur.kind==="video";
+    const badge = isVid
+      ? `<span class="badge b-vid">k${c.ci} → k${c.ci+1} 잇기 · 10초</span>`
+      : (c.ci===1 ? `<span class="badge b-new">🆕 새 생성으로 시작</span>`
+                  : `<span class="badge b-edit">↳ k${c.ci-1} 스레드에서 편집</span>`);
+    const p=promptFor(cur);
+    const shown=esc(p).split("[SEED]").join('<mark>[SEED]</mark>');
+    now.innerHTML=`
+      <div class="now-top">
+        <div style="flex:1;min-width:230px">
+          <div class="now-eyebrow">다음 작업</div>
+          <div class="now-name">${esc(cur.id)}</div>
+          <p class="now-where">제${c.block}블록 <b>${esc(c.title)}</b><br>
+            B${c.bi} ${esc(c.name)} · ${c.ci}/${c.n}컷 · 조명 ${c.light} · ${c.tempo} ${c.sec}초</p>
+        </div>
+        <div class="now-side">${badge}</div>
+      </div>
+      <div class="prompt">${shown}</div>
+      <div class="now-act">
+        <button class="btn btn-main" id="a1">프롬프트 복사</button>
+        <button class="btn btn-2" id="a2">복사하고 완료 표시</button>
+        <button class="btn btn-2" id="a3">파일명 복사</button>
+        <span class="hint">${isVid?"Flow Omni · 두 장을 넣어 잇는다":"16:9 · 1장 생성"}</span>
+      </div>`;
+    document.getElementById("a1").onclick=()=>copy(p,"프롬프트를 복사했다");
+    document.getElementById("a2").onclick=()=>{copy(p,"복사 · "+cur.id+" 완료");S.done[cur.id]=1;save();render();};
+    document.getElementById("a3").onclick=()=>copy(cur.id,"파일명을 복사했다");
+    if(!S.seed && S.mode==="mj" && !isVid)
+      now.insertAdjacentHTML("beforeend",
+        `<p class="hint" style="padding:0 20px 18px;margin:0">시드를 아직 안 넣었다. 첫 장을 뽑은 뒤 위 <b>시드</b> 칸에 값을 넣으면 이후 전부 자동으로 치환된다.</p>`);
+  }
+
+  /* 블록 목록 */
+  const byId={}; list.forEach(i=>byId[i.id]=i);
+  let h="";
+  for(const b of SPEC.blocks){
+    const mine=list.filter(i=>i.cut.block===b.no);
+    const d=mine.filter(i=>S.done[i.id]).length;
+    h+=`<div class="blk"><div class="blk-h">
+      <span class="blk-no">${b.no}</span>
+      <span class="blk-t">${esc(b.title)}</span>
+      <span class="blk-m">${d}/${mine.length} · 조명 ${b.light} · ${b.seconds}초</span></div>`;
+    b.beats.forEach(([code,n],i)=>{
+      const bi=i+1;
+      const row=mine.filter(x=>x.cut.bi===bi);
+      if(!row.length) return;
+      h+=`<div class="beat"><div class="beat-h"><b>B${bi} ${esc(SPEC.scenes[code].name)}</b>
+        <span>${n}컷</span></div><div class="cuts">`;
+      for(const it of row){
+        const isCur=cur&&it.id===cur.id;
+        const isNew = it.kind==="image" && it.cut.ci===1;
+        h+=`<button class="cut${it.kind==="video"?" v":""}${isNew?" k1":""}" data-id="${it.id}"
+            data-done="${S.done[it.id]?1:0}" data-cur="${isCur?1:0}"
+            title="${esc(it.id)}${isNew?" — 새 생성으로 시작":""}">
+            <span class="dot"></span>${it.kind==="video"?"v":"k"}${it.cut.ci}</button>`;
+      }
+      h+=`</div></div>`;
+    });
+    h+=`</div>`;
+  }
+  document.getElementById("legend").innerHTML = S.stage==="image"
+    ? '<i></i> 붉은 선이 그어진 k1은 <b style="font-weight:500">새 생성</b>으로 시작한다. 나머지는 그 스레드에서 편집한다.'
+    : '<i></i> 클립 하나는 앞뒤 두 장을 넣어 잇는다. 각 10초.';
+  document.getElementById("list").innerHTML=h;
+  document.querySelectorAll(".cut").forEach(el=>{
+    el.onclick=()=>{
+      const id=el.dataset.id;
+      if(S.done[id]) delete S.done[id]; else S.done[id]=1;
+      save(); render();
+    };
+  });
+}
+
+/* ── 제어 ───────────────────────────────────────────── */
+function setStage(v){
+  S.stage=v; save();
+  document.getElementById("st-img").setAttribute("aria-pressed",v==="image");
+  document.getElementById("st-vid").setAttribute("aria-pressed",v==="video");
+  render(); window.scrollTo({top:0,behavior:"smooth"});
+}
+function setMode(v){
+  S.mode=v; save();
+  document.getElementById("md-nat").setAttribute("aria-pressed",v==="natural");
+  document.getElementById("md-mj").setAttribute("aria-pressed",v==="mj");
+  render();
+}
+document.getElementById("st-img").onclick=()=>setStage("image");
+document.getElementById("st-vid").onclick=()=>setStage("video");
+document.getElementById("md-nat").onclick=()=>setMode("natural");
+document.getElementById("md-mj").onclick=()=>setMode("mj");
+
+const seedEl=document.getElementById("seed");
+seedEl.value=S.seed;
+seedEl.oninput=()=>{S.seed=seedEl.value.trim();save();render();};
+
+document.getElementById("exp").onclick=async()=>{
+  const text=JSON.stringify(S,null,2), fn="거북선_진행.json";
+  // 아티팩트로 볼 때는 뷰어가 저장을 중개한다. 로컬 HTML 파일로 열었을 때는
+  // window.claude 가 없으므로 평범한 링크로 내려받는다.
+  let dl=null;
+  try{ dl = await window.claude?.use?.("downloads"); }catch(e){}
+  if(dl){
+    try{ await dl.save({filename:fn,data:text}); toast("진행 파일을 저장했다"); }
+    catch(e){ toast(e && e.code==="declined" ? "저장을 취소했다" : "저장할 수 없다"); }
+    return;
+  }
+  if(window.claude){ toast("이 화면에서는 저장할 수 없다 — 내려받은 HTML 파일에서 하면 된다"); return; }
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([text],{type:"application/json"}));
+  a.download=fn; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast("진행 파일을 내려받았다");
+};
+document.getElementById("imp").onclick=()=>{
+  const f=document.createElement("input"); f.type="file"; f.accept=".json,application/json";
+  f.onchange=()=>{
+    const file=f.files&&f.files[0]; if(!file) return;
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const d=JSON.parse(r.result);
+        if(!d||typeof d.done!=="object") throw 0;
+        S=Object.assign(S,d); save();
+        seedEl.value=S.seed||"";
+        setStage(S.stage||"image"); setMode(S.mode||"natural");
+        toast("진행 상황을 불러왔다");
+      }catch(e){ toast("읽을 수 없는 파일이다"); }
+    };
+    r.readAsText(file);
+  };
+  f.click();
+};
+
+setStage(S.stage); setMode(S.mode);
+</script>

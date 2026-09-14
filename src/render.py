@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 
 from . import prompts
@@ -151,3 +152,21 @@ def queue(spec: Spec, path: Path, mode: str = "mj") -> int:
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return len(lines)
+
+
+TEMPLATE = Path(__file__).resolve().parent / "app_template.html"
+
+
+def webapp(spec: Spec, path: Path) -> int:
+    """스펙을 심은 단일 HTML 작업대.
+
+    프롬프트 본문을 굽지 않고 스펙만 넣는다. 조립 규칙은 브라우저 쪽에서
+    prompts.py와 같은 순서로 다시 수행하므로, 스펙 한 곳만 고치면 CLI와
+    앱이 함께 따라온다.
+    """
+    html = TEMPLATE.read_text(encoding="utf-8")
+    payload = json.dumps(spec.data, ensure_ascii=False, separators=(",", ":"))
+    if "/*__SPEC__*/" not in html:
+        raise ValueError("템플릿에 /*__SPEC__*/ 자리가 없다")
+    path.write_text(html.replace("/*__SPEC__*/{}", payload), encoding="utf-8")
+    return path.stat().st_size
