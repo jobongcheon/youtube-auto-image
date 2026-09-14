@@ -75,6 +75,9 @@ def cmd_build(args) -> None:
     made.append((outdir / "대기열_이미지.tsv", f"{n}행"))
     n = render.webapp(spec, outdir / "작업대.html")
     made.append((outdir / "작업대.html", f"{n // 1024}KB"))
+    if args.installer:
+        z = render.installer(spec, outdir / "거북선작업대.zip")
+        made.append((outdir / "거북선작업대.zip", f"{z // 1024}KB · 윈도우 설치본"))
 
     for path, note in made:
         print(f"  생성  {path}  ({note})")
@@ -162,6 +165,8 @@ def main(argv=None) -> None:
     p = sub.add_parser("build", help="시트·매니페스트·대기열 생성")
     p.add_argument("--out", default="out")
     p.add_argument("--mode", choices=["mj", "natural", "both"], default="both")
+    p.add_argument("--installer", action="store_true",
+                   help="윈도우 바탕화면 설치용 zip 도 함께 만든다")
     p.set_defaults(func=cmd_build)
 
     p = sub.add_parser("stats", help="규모 요약")

@@ -170,3 +170,23 @@ def webapp(spec: Spec, path: Path) -> int:
         raise ValueError("템플릿에 /*__SPEC__*/ 자리가 없다")
     path.write_text(html.replace("/*__SPEC__*/{}", payload), encoding="utf-8")
     return path.stat().st_size
+
+
+INSTALLER = Path(__file__).resolve().parent.parent / "installer"
+
+
+def installer(spec: Spec, path: Path) -> int:
+    """윈도우 바탕화면 설치용 zip.
+
+    압축 안의 이름은 전부 ASCII로 둔다 — 윈도우 탐색기의 기본 압축 기능은
+    UTF-8 플래그를 무시하고 OEM 코드페이지로 읽어 한글 이름을 깨뜨린다.
+    """
+    import zipfile
+
+    app = INSTALLER / "app.html"
+    app.write_text((path.parent / "작업대.html").read_text(encoding="utf-8"),
+                   encoding="utf-8")
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
+        for name in ("INSTALL.bat", "install.ps1", "app.html", "README.txt"):
+            z.write(INSTALLER / name, name)
+    return path.stat().st_size
