@@ -1,0 +1,610 @@
+<title>보고서 작성대</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+<style>
+:root{
+  --desk:#E6E9EE; --panel:#FFFFFF; --ink:#1A2130; --muted:#5A6475; --line:#CDD3DC;
+  --field:#F6F7F9; --accent:#1E4E8C; --accent-ink:#FFFFFF; --accent-soft:#E3EBF6;
+  --warn:#9A3412; --warn-soft:#FDEDE4; --ok:#1F6B45;
+  --paper:#FFFFFF; --paper-ink:#111111; --paper-shadow:0 1px 2px rgba(20,30,50,.08),0 8px 28px rgba(20,30,50,.12);
+  --ui:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --desk:#12161C; --panel:#1A2029; --ink:#E4E8EF; --muted:#9AA4B4; --line:#2E3744;
+    --field:#141920; --accent:#7EA6E0; --accent-ink:#0E1522; --accent-soft:#1F2B3D;
+    --warn:#F2A07B; --warn-soft:#3A2219; --ok:#7CCBA0;
+    --paper-shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --desk:#12161C; --panel:#1A2029; --ink:#E4E8EF; --muted:#9AA4B4; --line:#2E3744;
+  --field:#141920; --accent:#7EA6E0; --accent-ink:#0E1522; --accent-soft:#1F2B3D;
+  --warn:#F2A07B; --warn-soft:#3A2219; --ok:#7CCBA0;
+  --paper-shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+body{background:var(--desk);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.55}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 40px}
+header.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:18px}
+header.top h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em}
+header.top p{margin:0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:920px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:18px}
+section.step{display:flex;flex-direction:column;gap:10px}
+section.step + section.step{border-top:1px solid var(--line);padding-top:16px}
+.step h2{margin:0;font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.04em}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row > *{flex:1 1 140px;min-width:0}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
+input[type=text],select,textarea{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
+textarea{min-height:420px;resize:vertical;font-size:13px;line-height:1.7;tab-size:2;white-space:pre}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,.file:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+button{font:inherit;font-weight:600;border-radius:6px;padding:9px 14px;cursor:pointer;border:1px solid var(--line);background:var(--field);color:var(--ink)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.file{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px dashed var(--line);border-radius:8px;padding:16px 12px;text-align:center;color:var(--muted);background:var(--field);cursor:pointer}
+.file.drag{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file b{color:var(--accent)}
+.status{font-size:12.5px;color:var(--muted);min-height:1.2em}
+.status.err{color:var(--warn)}
+.status.ok{color:var(--ok)}
+.err-box{background:var(--warn-soft);color:var(--warn);border-radius:6px;padding:8px 10px;font-size:13px}
+details.help summary{cursor:pointer;color:var(--accent);font-size:13px;font-weight:500}
+details.help table{border-collapse:collapse;font-size:12.5px;margin-top:8px;width:100%}
+details.help td{border-top:1px solid var(--line);padding:5px 6px;vertical-align:top}
+details.help td:first-child{white-space:nowrap;font-family:ui-monospace,Consolas,monospace;color:var(--accent)}
+.stage{display:flex;flex-direction:column;gap:10px;min-width:0}
+.stage-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 12px}
+.stage-head h2{margin:0;font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.04em}
+.stage-head span{font-size:12.5px;color:var(--muted)}
+
+/* ── A4 종이: 모든 크기를 종이 폭 기준(cqw)으로 잡아 화면 폭이 달라도 비율이 같다 ── */
+.sheet{container-type:inline-size;width:100%;max-width:820px;margin:0 auto;background:var(--paper);color:var(--paper-ink);box-shadow:var(--paper-shadow);border-radius:2px}
+.page{--pt:.16793cqw;--mm:.47619cqw;padding:calc(15*var(--mm)) calc(20*var(--mm)) calc(18*var(--mm));min-height:calc(297*var(--mm))}
+.myeongjo{font-family:"휴먼명조","HumanMyeongjo","Nanum Myeongjo",serif}
+.headline{font-family:"HY헤드라인M","HYHeadLine M","Nanum Gothic",sans-serif;font-weight:800}
+.gothic{font-family:"HY중고딕","중고딕","Nanum Gothic",sans-serif}
+.pg p{margin:0}
+.pg .title{border:calc(1.5*var(--pt)) solid #000;padding:calc(8*var(--pt)) calc(6*var(--pt));text-align:center;font-size:calc(22*var(--pt));line-height:1.6;text-wrap:balance}
+.pg .meta{text-align:right;font-size:calc(12*var(--pt));line-height:1.6;margin-top:calc(4*var(--pt))}
+.pg .summary{margin-top:calc(14*var(--pt));border-top:calc(3*var(--pt)) double #000;border-bottom:calc(3*var(--pt)) double #000;padding:calc(4*var(--pt)) calc(4*var(--pt));font-size:calc(15*var(--pt));line-height:1.6}
+.pg .h{font-size:calc(16*var(--pt));line-height:1.6;margin-top:calc(25*var(--pt));margin-bottom:calc(5*var(--pt))}
+.pg .h.roman{font-size:calc(17*var(--pt))}
+.pg .h.first{margin-top:calc(12*var(--pt))}
+.pg .b{font-size:calc(15*var(--pt));line-height:1.6;margin-top:calc(5*var(--pt))}
+.pg .b.note{font-size:calc(13*var(--pt));margin-top:calc(3*var(--pt))}
+.pg .txt{font-size:calc(15*var(--pt));line-height:1.6;margin-top:calc(5*var(--pt))}
+.pg .attach{font-size:calc(15*var(--pt));line-height:1.6;margin-top:calc(20*var(--pt))}
+.pg table{border-collapse:collapse;width:100%;table-layout:fixed;margin:calc(3*var(--pt)) 0 calc(10*var(--pt))}
+.pg th,.pg td{border:calc(.75*var(--pt)) solid #000;padding:calc(1*var(--pt)) calc(3*var(--pt));text-align:center;font-size:calc(13*var(--pt));line-height:1.6;word-break:keep-all;overflow-wrap:anywhere}
+.pg th{background:#D9D9D9;font-weight:700}
+.pg strong{font-weight:800}
+.empty-sheet{padding:48px 24px;text-align:center;color:#666;font-family:var(--ui)}
+@media (prefers-reduced-motion:no-preference){.file,button{transition:background-color .15s,border-color .15s}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>보고서 작성대</h1>
+    <p>엑셀을 올리거나 초안을 쓰면, 공대통합행정실 표준 서식 보고서로 바로 바뀝니다.</p>
+  </header>
+
+  <div class="grid">
+    <div class="panel">
+      <section class="step" aria-labelledby="s1">
+        <h2 id="s1">엑셀에서 보고서 만들기</h2>
+        <label class="file" id="drop">
+          <input type="file" id="xl" accept=".xlsx,.xlsm,.xls,.csv">
+          <span>상담 데이터 엑셀을 <b>여기에 끌어다 놓거나 눌러서 선택</b></span>
+        </label>
+        <div class="row">
+          <label class="f">분기
+            <select id="quarter" disabled><option>엑셀을 먼저 올리세요</option></select>
+          </label>
+          <label class="f">부서
+            <input type="text" id="dept" value="공대통합행정실" autocomplete="off">
+          </label>
+        </div>
+        <button class="primary" id="makeBtn" disabled>이 분기로 초안 만들기</button>
+        <div class="status" id="xlStatus" role="status">파일은 이 브라우저 안에서만 읽습니다. 어디로도 올라가지 않습니다.</div>
+      </section>
+
+      <section class="step" aria-labelledby="s2">
+        <h2 id="s2">초안</h2>
+        <label class="f">예시 불러오기
+          <select id="sample">
+            <option value="실적">2026년 2분기 상담 실적 (올려주신 엑셀로 만든 것)</option>
+            <option value="방문">총장님, 교육부 방문 계획(안) (참고 자료 5쪽)</option>
+            <option value="">빈 초안</option>
+          </select>
+        </label>
+        <textarea id="draft" spellcheck="false" aria-label="보고서 초안"></textarea>
+        <div class="err-box" id="parseErr" hidden></div>
+        <details class="help">
+          <summary>초안 쓰는 법</summary>
+          <table>
+            <tr><td>제목: …</td><td>맨 위. 제목 상자에 들어갑니다 (필수)</td></tr>
+            <tr><td>날짜: / 부서:</td><td>제목 아래 오른쪽 &lt; 날짜, 부서 &gt;</td></tr>
+            <tr><td>개요: …</td><td>겹줄 개요 상자. 없으면 생략</td></tr>
+            <tr><td>□ 큰제목</td><td>HY헤드라인M 16p</td></tr>
+            <tr><td>○ - ·</td><td>본문 휴먼명조 15p, 1·2·3칸 들여쓰기</td></tr>
+            <tr><td>※ 참고</td><td>중고딕 13p, 4칸 들여쓰기</td></tr>
+            <tr><td>I. II.</td><td>4~5쪽 넘는 긴 보고서의 큰 항목</td></tr>
+            <tr><td>| 가 | 나 |</td><td>표. 첫 줄은 회색 머리행</td></tr>
+            <tr><td>**굵게**</td><td>굵은 글씨. ○ 뒤 (괄호 제목)은 자동으로 굵게</td></tr>
+            <tr><td>붙임: …</td><td>끝에 "붙임 … 끝."</td></tr>
+            <tr><td># 메모</td><td>보고서에 찍히지 않음</td></tr>
+          </table>
+        </details>
+      </section>
+
+      <section class="step" aria-labelledby="s3">
+        <h2 id="s3">저장</h2>
+        <div class="row">
+          <button class="primary" id="saveDocx">워드(.docx)로 저장</button>
+          <button id="saveTxt">초안(.txt) 저장</button>
+        </div>
+        <div class="status" id="saveStatus" role="status">.docx는 한글에서 열어 '다른 이름으로 저장 → .hwp' 하면 됩니다.</div>
+      </section>
+    </div>
+
+    <div class="stage">
+      <div class="stage-head">
+        <h2>미리보기 · A4</h2>
+        <span>화면에는 비슷한 글꼴로 보이고, 저장한 파일은 한글 PC에서 HY헤드라인M·휴먼명조로 열립니다</span>
+      </div>
+      <div class="sheet"><div class="page pg" id="preview"></div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script>
+const SAMPLES = {
+"실적": "제목: 2026년 2분기 상담 실적 현황 보고\n날짜: '26. 9. 23.(수)\n부서: 공대통합행정실\n개요: 2026년 2분기(2026.04.01.~06.30.) 상담 리드 1,809건의 전환 실적과 유입경로·상담원별 성과를 분석하여 보고 드림\n\n□ 실적 개요\n○ (상담 건수) 총 **1,809건**, 상담원 20명, 건당 평균 통화 15.3분\n- 전 분기(2026년 1분기) 1,788건 대비 ▲1.2%\n○ (전환 실적) **126건 전환**, 전환율 **7.0%**\n- 전 분기 전환율 6.9% 대비 ▲0.1%p\n○ (매출) 총 **5,391천**, 전환 1건당 평균 43천\n- 전 분기 5,284천 대비 ▲2.0%\n| 구분 | 상담 | 전환 | 전환율 | 매출(천) |\n| 4월 | 597 | 36 | 6.0% | 1,557 |\n| 5월 | 636 | 53 | 8.3% | 2,263 |\n| 6월 | 576 | 37 | 6.4% | 1,570 |\n| 계 | 1,809 | 126 | 7.0% | 5,391 |\n\n□ 유입경로별 전환 현황\n○ 전환율 최고는 **아웃바운드 캠페인**(9.9%), 최저는 지인 추천(3.9%)\n- 두 경로 간 전환율 차이 6.0%p\n| 유입경로 | 상담 | 전환 | 전환율 | 매출(천) |\n| 아웃바운드 캠페인 | 203 | 20 | 9.9% | 1,031 |\n| 인바운드 전화 | 244 | 24 | 9.8% | 1,048 |\n| 이메일 캠페인 | 214 | 15 | 7.0% | 566 |\n| 링크드인 광고 | 258 | 17 | 6.6% | 837 |\n| 홈페이지 | 215 | 14 | 6.5% | 590 |\n| 구글 광고 | 219 | 14 | 6.4% | 414 |\n| 페이스북 광고 | 225 | 13 | 5.8% | 449 |\n| 지인 추천 | 231 | 9 | 3.9% | 456 |\n\n□ 상담원별 실적\n○ 매출 1위 **David Wilson**: 전환 11건, 매출 528천\n- 상위 5명 매출 합계가 전체의 42.9% 차지\n| 순위 | 상담원 | 상담 | 전환 | 전환율 | 매출(천) |\n| 1 | David Wilson | 74 | 11 | 14.9% | 528 |\n| 2 | William Brown | 92 | 11 | 12.0% | 503 |\n| 3 | Amanda Clark | 97 | 10 | 10.3% | 499 |\n| 4 | Emily Garcia | 83 | 8 | 9.6% | 395 |\n| 5 | Olivia Lewis | 92 | 10 | 10.9% | 387 |\n\n□ 지역·상품별 매출\n○ (지역) 남서부 1,216천, 북동부 1,193천, 서부 해안 1,164천, 중서부 951천, 남동부 867천\n○ (상품) 상위 3개 SaaS 구독 1,181천, 경영 컨설팅 1,014천, 보안 서비스 855천\n\n□ 향후 조치\n○ (후속 조치) 후속 연락 **대기 467건** 중 관심 표명·회신 요청 고객 **136건** 우선 연락\n○ (유입경로) 전환율이 높은 아웃바운드 캠페인 비중 확대, 지인 추천 경로는 효과 점검\n※ 금액 단위: 천(원본 엑셀의 Revenue Generated 기준)\n",
+"방문": "제목: 총장님, 교육부 방문 계획(안)\n날짜: '24. 6. 14.(금)\n부서: 총무과\n\n□ 방문 개요\n○ (목적) 총장 임기 개시 이후 원활한 업무추진을 위한 **중앙부처**와의 **소통 강화** 및 **주요 현안** 관련 **건의사항 전달**\n○ (일시) '24. 6. 20.(목), 10:30~11:40\n※ 총장님 임명장 수여식(10:00, 총리실) 이후 교육부 방문 예정\n○ (장소) 교육부(세종시)\n○ (참석자) 총장, 기획처장, 사무국장, 총무과장\n※ 당일 06:40분 학교 출발\n\n□ 세부 일정(안)\n| 시간 | 주요 내용 | 비고 |\n| 06:40~10:15 (215') | 학교 출발 및 교육부(세종) 도착 | |\n| 10:15~10:30 (15') | 총장님 총리실 → 교육부 이동 | 14-2동(교육부 入) |\n| 10:30~11:40 (70') | 교육부 실국 방문 | 14-1동(교육부 出) |\n| 11:40~13:00 (80') | 점심 식사 | 세종청사 인근 |\n| 13:00~13:20 (20') | 기획재정부 이동 | 세종청사 중앙동 |\n| 13:20~14:00 (40') | 기획재정부 실국 방문 | 중앙동 5층 |\n| 14:00~17:30 (210') | 학교 도착 | |\n※ 실국장급 이상 간부가 부재 시 부서(과)만 방문 예정\n"
+};
+
+
+// ── 표준 서식 (참고 자료 2~3쪽) ─────────────────────────────
+const STYLE = {
+  HEADLINE: "HY헤드라인M", MYEONGJO: "휴먼명조", GOTHIC: "HY중고딕", LINE: 1.6,
+  page: { w: 210, h: 297, top: 15, bottom: 15, left: 20, right: 20, header: 10, footer: 10 },
+  TITLE:   { font: "HEADLINE", size: 22 },
+  META:    { font: "MYEONGJO", size: 12, before: 4 },
+  SUMMARY: { font: "GOTHIC", size: 15, before: 5 },
+  ROMAN:   { font: "HEADLINE", size: 17, before: 25, after: 5 },
+  HEADING: { font: "HEADLINE", size: 16, before: 25, after: 5 },
+  BODY:    { font: "MYEONGJO", size: 15, before: 5 },
+  NOTE:    { font: "GOTHIC", size: 13, before: 3 },
+  TABLE:   { font: "MYEONGJO", size: 13 },
+  CELL_MARGIN_PT: 3, HEADER_FILL: "D9D9D9",
+};
+const BULLETS = { "○": [1, 1, "BODY"], "-": [2, 2, "BODY"], "·": [3, 3, "BODY"], "※": [4, 4, "NOTE"] };
+const ALIASES = { "o": "○", "ㅇ": "○", "◦": "○", "•": "·", "ㆍ": "·", "–": "-", "*": "※" };
+const ARROWS = ["☞", "⇒", "→"];
+const HEADING_MARKS = ["□", "☐", "◈"];
+const HEADER_KEYS = { "제목": "title", "날짜": "date", "부서": "dept", "개요": "summary" };
+const ROMAN_RE = /^([IVX]+|[ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ])\s*\.?\s+(.+)$/;
+const EMPH_RE = /\*\*(.+?)\*\*/g;
+const LABEL_RE = /^(\([^)]{1,12}\))/;
+
+// ── 초안 읽기 ────────────────────────────────────────────────
+function parseDraft(text) {
+  const rep = { title: "", date: "", dept: "", summary: "", blocks: [] };
+  let inHeader = true, table = null;
+  const lines = text.split(/\r?\n/);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line.startsWith("|")) table = null;
+    if (!line || line.startsWith("#")) continue;
+    if (inHeader) {
+      const k = line.indexOf(":");
+      if (k > 0 && HEADER_KEYS[line.slice(0, k).trim()]) {
+        rep[HEADER_KEYS[line.slice(0, k).trim()]] = line.slice(k + 1).trim();
+        continue;
+      }
+      inHeader = false;
+    }
+    if (line.startsWith("|")) {
+      const cells = line.replace(/^\|/, "").replace(/\|$/, "").split("|").map(c => c.trim());
+      if (cells.every(c => !c || /^:?-{2,}:?$/.test(c))) continue;
+      if (!table) { table = { kind: "table", rows: [] }; rep.blocks.push(table); }
+      else if (cells.length !== table.rows[0].length)
+        throw new Error(`${i + 1}번째 줄: 표의 칸 수가 ${cells.length}개인데 첫 줄은 ${table.rows[0].length}개입니다`);
+      table.rows.push(cells);
+      continue;
+    }
+    if (HEADING_MARKS.includes(line[0])) { rep.blocks.push({ kind: "heading", mark: line[0], text: line.slice(1).trim() }); continue; }
+    const m = line.match(ROMAN_RE);
+    if (m) { rep.blocks.push({ kind: "roman", mark: m[1], text: m[2] }); continue; }
+    if (line.startsWith("붙임")) {
+      rep.blocks.push({ kind: "attach", text: line.includes(":") ? line.split(":").slice(1).join(":").trim() : line.slice(2).trim() });
+      continue;
+    }
+    const sp = line.indexOf(" ");
+    if (sp > 0) {
+      let head = line.slice(0, sp); head = ALIASES[head] || head;
+      const rest = line.slice(sp + 1).trim();
+      if (rest && (BULLETS[head] || ARROWS.includes(head))) { rep.blocks.push({ kind: "bullet", mark: head, text: rest }); continue; }
+    }
+    rep.blocks.push({ kind: "text", text: line });
+  }
+  if (!rep.title) throw new Error("첫 줄에 '제목: ...' 이 있어야 합니다");
+  return rep;
+}
+
+function dumpDraft(rep) {
+  const out = [`제목: ${rep.title}`];
+  if (rep.date) out.push(`날짜: ${rep.date}`);
+  if (rep.dept) out.push(`부서: ${rep.dept}`);
+  if (rep.summary) out.push(`개요: ${rep.summary}`);
+  for (const b of rep.blocks) {
+    if (b.kind === "heading") out.push("", `${b.mark || "□"} ${b.text}`);
+    else if (b.kind === "roman") out.push("", `${b.mark}. ${b.text}`);
+    else if (b.kind === "bullet") out.push(`${b.mark} ${b.text}`);
+    else if (b.kind === "table") b.rows.forEach(r => out.push("| " + r.join(" | ") + " |"));
+    else if (b.kind === "attach") out.push("", `붙임: ${b.text}`);
+    else out.push(b.text);
+  }
+  return out.join("\n") + "\n";
+}
+
+function segments(text, boldLabel) {
+  // [{text, bold}] — **굵게** 와 ○ 뒤 (괄호 제목)
+  const segs = [];
+  if (boldLabel) {
+    const m = text.match(LABEL_RE);
+    if (m) { segs.push({ text: m[1], bold: true }); text = text.slice(m[0].length); }
+  }
+  text.split(EMPH_RE).forEach((part, i) => { if (part) segs.push({ text: part, bold: i % 2 === 1 }); });
+  return segs;
+}
+const bulletOf = mark => BULLETS[ALIASES[mark] || mark] || BULLETS["-"];
+const markOf = mark => ALIASES[mark] || mark;
+
+// ── 미리보기 ─────────────────────────────────────────────────
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const html = (text, boldLabel) => segments(text, boldLabel).map(s => s.bold ? `<strong>${esc(s.text)}</strong>` : esc(s.text)).join("");
+const fontClass = key => ({ HEADLINE: "headline", MYEONGJO: "myeongjo", GOTHIC: "gothic" })[key];
+
+function textWidth(s) { let w = 0; for (const ch of s.replace(EMPH_RE, "$1")) w += ch.codePointAt(0) > 0x2E7F ? 2 : 1; return w; }
+function colWidths(rows, total) {
+  const need = rows[0].map((_, c) => Math.max(...rows.map(r => textWidth(r[c]))) + 2);
+  const sum = need.reduce((a, b) => a + b, 0), floor = total / need.length * 0.45;
+  const raw = need.map(n => total * n / sum);
+  const short = raw.reduce((a, w) => a + Math.max(0, floor - w), 0);
+  const spare = raw.reduce((a, w) => a + (w > floor ? w - floor : 0), 0) || 1;
+  return raw.map(w => w <= floor ? floor : w - short * (w - floor) / spare);
+}
+
+function renderPreview(rep) {
+  const o = [];
+  o.push(`<p class="title headline">${html(rep.title)}</p>`);
+  if (rep.date || rep.dept) o.push(`<p class="meta myeongjo">&lt; ${esc([rep.date, rep.dept].filter(Boolean).join(", "))} &gt;</p>`);
+  if (rep.summary) o.push(`<p class="summary gothic">${html(rep.summary)}</p>`);
+  let first = true;
+  for (const b of rep.blocks) {
+    if (b.kind === "heading" || b.kind === "roman") {
+      const mark = b.kind === "roman" ? `${b.mark}.` : b.mark;
+      o.push(`<p class="h headline ${b.kind === "roman" ? "roman" : ""} ${first ? "first" : ""}">${esc(mark)} ${html(b.text)}</p>`);
+    } else if (b.kind === "bullet") {
+      const [, spaces, fk] = bulletOf(b.mark), f = STYLE[fk], mark = markOf(b.mark);
+      const space = f.size / 2, hang = f.size + space;
+      o.push(`<p class="b ${fontClass(f.font)} ${fk === "NOTE" ? "note" : ""}" style="padding-left:calc(${spaces * space + hang}*var(--pt));text-indent:calc(${-hang}*var(--pt))">${esc(mark)} ${html(b.text, mark === "○")}</p>`);
+    } else if (b.kind === "table") {
+      const w = colWidths(b.rows, 170);
+      o.push(`<table class="myeongjo"><colgroup>${w.map(x => `<col style="width:${(x / 170 * 100).toFixed(2)}%">`).join("")}</colgroup>` +
+        b.rows.map((r, i) => `<tr>${r.map(c => i === 0 ? `<th>${html(c)}</th>` : `<td>${html(c)}</td>`).join("")}</tr>`).join("") + `</table>`);
+    } else if (b.kind === "attach") {
+      o.push(`<p class="attach myeongjo">붙임&nbsp; ${html(b.text)}${/끝\.\s*$/.test(b.text) ? "" : "&nbsp; 끝."}</p>`);
+    } else {
+      o.push(`<p class="txt myeongjo">${html(b.text)}</p>`);
+    }
+    first = false;
+  }
+  return o.join("");
+}
+
+// ── 워드(.docx) ──────────────────────────────────────────────
+const TW_PER_MM = 1440 / 25.4;
+function buildDocx(rep) {
+  const D = window.docx;
+  const P = STYLE.page, totalMm = P.w - P.left - P.right;
+  const fontObj = key => { const n = STYLE[key]; return { ascii: n, hAnsi: n, eastAsia: n, cs: n }; };
+  const runs = (text, f, { boldLabel = false, forceBold = false } = {}) =>
+    segments(text, boldLabel).map(s => new D.TextRun({ text: s.text, bold: s.bold || forceBold, size: f.size * 2, font: fontObj(f.font) }));
+  const spacing = (f, before) => ({ line: Math.round(f.size * STYLE.LINE * 20), lineRule: "exact",
+    before: Math.round((before ?? f.before ?? 0) * 20), after: Math.round((f.after ?? 0) * 20) });
+  const line = (style, sz) => ({ style, size: sz, color: "000000" });
+  const none = { style: D.BorderStyle.NONE, size: 0, color: "FFFFFF" };
+  const box = (text, f, align, borders, pad) => new D.Table({
+    width: { size: Math.round(totalMm * TW_PER_MM), type: D.WidthType.DXA },
+    columnWidths: [Math.round(totalMm * TW_PER_MM)], alignment: D.AlignmentType.CENTER,
+    borders: { top: none, bottom: none, left: none, right: none, insideHorizontal: none, insideVertical: none },
+    rows: [new D.TableRow({ children: [new D.TableCell({
+      borders, children: [new D.Paragraph({ alignment: align,
+        spacing: { ...spacing(f, pad), after: Math.round(pad * 20) }, children: runs(text, f) })] })] })],
+  });
+  const gap = () => new D.Paragraph({ spacing: { before: 0, after: 0 }, children: [] });
+
+  const kids = [];
+  const all = line(D.BorderStyle.SINGLE, 12);
+  kids.push(box(rep.title, STYLE.TITLE, D.AlignmentType.CENTER, { top: all, bottom: all, left: all, right: all }, 8));
+  if (rep.date || rep.dept)
+    kids.push(new D.Paragraph({ alignment: D.AlignmentType.RIGHT, spacing: spacing(STYLE.META),
+      children: runs(`< ${[rep.date, rep.dept].filter(Boolean).join(", ")} >`, STYLE.META) }));
+  if (rep.summary) {
+    const dbl = line(D.BorderStyle.DOUBLE, 6);
+    kids.push(gap(), box(rep.summary, STYLE.SUMMARY, D.AlignmentType.LEFT, { top: dbl, bottom: dbl, left: none, right: none }, 4));
+  }
+  let first = true;
+  for (const b of rep.blocks) {
+    if (b.kind === "heading" || b.kind === "roman") {
+      const f = b.kind === "roman" ? STYLE.ROMAN : STYLE.HEADING;
+      kids.push(new D.Paragraph({ keepNext: true, spacing: spacing(f, first ? f.before / 2 : undefined),
+        children: [new D.TextRun({ text: (b.kind === "roman" ? `${b.mark}. ` : `${b.mark} `), size: f.size * 2, font: fontObj(f.font) }), ...runs(b.text, f)] }));
+    } else if (b.kind === "bullet") {
+      const [, spaces, fk] = bulletOf(b.mark), f = STYLE[fk], mark = markOf(b.mark);
+      const space = f.size / 2, hang = f.size + space;
+      kids.push(new D.Paragraph({ spacing: spacing(f),
+        indent: { left: Math.round((spaces * space + hang) * 20), hanging: Math.round(hang * 20) },
+        children: [new D.TextRun({ text: `${mark} `, size: f.size * 2, font: fontObj(f.font) }), ...runs(b.text, f, { boldLabel: mark === "○" })] }));
+    } else if (b.kind === "table") {
+      const f = STYLE.TABLE, widths = colWidths(b.rows, totalMm).map(w => Math.round(w * TW_PER_MM));
+      const m = STYLE.CELL_MARGIN_PT * 20, keep = b.rows.length <= 12;
+      kids.push(new D.Table({
+        width: { size: widths.reduce((a, x) => a + x, 0), type: D.WidthType.DXA }, columnWidths: widths,
+        layout: D.TableLayoutType.FIXED, alignment: D.AlignmentType.CENTER,
+        rows: b.rows.map((r, ri) => new D.TableRow({ tableHeader: ri === 0, cantSplit: true,
+          children: r.map((c, ci) => new D.TableCell({
+            width: { size: widths[ci], type: D.WidthType.DXA },
+            margins: { left: m, right: m, top: 20, bottom: 20 },
+            shading: ri === 0 ? { fill: STYLE.HEADER_FILL, type: D.ShadingType.CLEAR, color: "auto" } : undefined,
+            children: [new D.Paragraph({ alignment: D.AlignmentType.CENTER, keepNext: keep && ri < b.rows.length - 1,
+              spacing: spacing(f, 0), children: runs(c, f, { forceBold: ri === 0 }) })] })) })),
+      }), gap());
+    } else if (b.kind === "attach") {
+      const tail = /끝\.\s*$/.test(b.text) ? "" : "  끝.";
+      kids.push(new D.Paragraph({ spacing: spacing(STYLE.BODY, 20), children: runs(`붙임  ${b.text}${tail}`, STYLE.BODY) }));
+    } else {
+      kids.push(new D.Paragraph({ spacing: spacing(STYLE.BODY), children: runs(b.text, STYLE.BODY) }));
+    }
+    first = false;
+  }
+  const pf = { size: 22, font: fontObj("MYEONGJO") };
+  const mm = x => Math.round(x * TW_PER_MM);
+  return new D.Document({ sections: [{
+    properties: { page: { size: { width: mm(P.w), height: mm(P.h) },
+      margin: { top: mm(P.top), bottom: mm(P.bottom), left: mm(P.left), right: mm(P.right), header: mm(P.header), footer: mm(P.footer) } } },
+    footers: { default: new D.Footer({ children: [new D.Paragraph({ alignment: D.AlignmentType.CENTER, children: [
+      new D.TextRun({ text: "- ", ...pf }), new D.TextRun({ children: [D.PageNumber.CURRENT], ...pf }), new D.TextRun({ text: " -", ...pf })] })] }) },
+    children: kids,
+  }] });
+}
+
+// ── 상담 엑셀 → 보고서 ───────────────────────────────────────
+const COLS = { date: "Call Date", agent: "Agent Name", source: "Lead Source", status: "Call Status",
+  minutes: "Call Duration (Min)", follow: "Follow-up Status", conv: "Conversion Status",
+  revenue: "Revenue Generated", region: "Region", product: "Product/Service", ctype: "Customer Type" };
+const KO = {
+  "Referral": "지인 추천", "Google Ads": "구글 광고", "Facebook Ads": "페이스북 광고", "LinkedIn Ads": "링크드인 광고",
+  "Inbound Call": "인바운드 전화", "Website": "홈페이지", "Email Campaign": "이메일 캠페인", "Outbound Campaign": "아웃바운드 캠페인",
+  "Midwest": "중서부", "Southeast": "남동부", "Southwest": "남서부", "Northeast": "북동부", "West Coast": "서부 해안",
+  "Business Consulting": "경영 컨설팅", "CRM Software": "CRM 소프트웨어", "Digital Marketing Services": "디지털 마케팅",
+  "Cloud Solutions": "클라우드", "SaaS Subscription": "SaaS 구독", "Cybersecurity Services": "보안 서비스",
+  "Insurance Plan": "보험 상품", "Business Loan": "사업자 대출" };
+const ko = v => KO[v] || v;
+const WEEKDAY = "일월화수목금토";
+
+function toDate(v) {
+  if (v instanceof Date) return new Date(v.getFullYear(), v.getMonth(), v.getDate());
+  if (typeof v === "number") { const d = XLSX.SSF.parse_date_code(v); return new Date(d.y, d.m - 1, d.d); }
+  const m = String(v).trim().match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})/);
+  if (!m) throw new Error(`날짜를 읽을 수 없습니다: ${v}`);
+  return new Date(+m[1], +m[2] - 1, +m[3]);
+}
+
+function loadLeads(wb) {
+  const name = wb.SheetNames.includes("Customer_Data") ? "Customer_Data" : wb.SheetNames[0];
+  const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, raw: true, defval: null });
+  const header = (rows[0] || []).map(h => h == null ? "" : String(h).trim());
+  const missing = Object.values(COLS).filter(c => !header.includes(c));
+  if (missing.length) throw new Error(`'${name}' 시트에 이 열이 없습니다: ${missing.join(", ")}`);
+  const ix = Object.fromEntries(Object.entries(COLS).map(([k, c]) => [k, header.indexOf(c)]));
+  const out = [];
+  for (let n = 1; n < rows.length; n++) {
+    const r = rows[n];
+    if (!r || r[ix.date] == null || r[ix.date] === "") continue;
+    const date = toDate(r[ix.date]);
+    out.push({ date, q: [date.getFullYear(), Math.floor(date.getMonth() / 3) + 1],
+      agent: String(r[ix.agent]), source: String(r[ix.source]), status: String(r[ix.status]),
+      minutes: +r[ix.minutes] || 0, follow: String(r[ix.follow]),
+      converted: String(r[ix.conv]).trim().toLowerCase() === "converted",
+      revenue: +r[ix.revenue] || 0, region: String(r[ix.region]), product: String(r[ix.product]) });
+  }
+  if (!out.length) throw new Error("데이터 행이 없습니다");
+  return out;
+}
+
+const qKey = q => `${q[0]}-Q${q[1]}`;
+const qName = q => `${q[0]}년 ${q[1]}분기`;
+const prevQ = ([y, n]) => n === 1 ? [y - 1, 4] : [y, n - 1];
+const stat = xs => { const s = { leads: 0, conv: 0, revenue: 0 }; for (const x of xs) { s.leads++; s.conv += x.converted; s.revenue += x.revenue; } s.rate = s.leads ? s.conv / s.leads * 100 : 0; return s; };
+const group = (xs, key) => { const g = new Map(); for (const x of xs) { const k = key(x); if (!g.has(k)) g.set(k, []); g.get(k).push(x); } return [...g].map(([k, v]) => [k, stat(v)]); };
+const n0 = v => v.toLocaleString("ko-KR");
+const won = v => Math.round(v / 1000).toLocaleString("ko-KR");
+const pct = v => `${v.toFixed(1)}%`;
+function delta(now, before, unit) {
+  if (!before) return "비교 불가";
+  let d = now - before;
+  if (unit === "%p") d = Math.round((Math.round(now * 10) - Math.round(before * 10))) / 10;
+  else if (Math.round(d / before * 1000) === 0) d = 0;
+  if (d === 0) return "동일";
+  const sign = d > 0 ? "▲" : "▼";
+  return unit === "%p" ? `${sign}${Math.abs(d).toFixed(1)}%p` : `${sign}${(Math.abs(d) / before * 100).toFixed(1)}%`;
+}
+const shortDate = d => `'${String(d.getFullYear()).slice(2)}. ${d.getMonth() + 1}. ${d.getDate()}.(${WEEKDAY[d.getDay()]})`;
+const ymd = d => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}.`;
+
+function leadsReport(leads, q, dept, top = 5) {
+  const cur = leads.filter(x => x.q[0] === q[0] && x.q[1] === q[1]);
+  if (!cur.length) throw new Error(`${qName(q)} 데이터가 없습니다`);
+  const pq = prevQ(q), prev = leads.filter(x => x.q[0] === pq[0] && x.q[1] === pq[1]);
+  const T = stat(cur), P = stat(prev);
+  const start = new Date(q[0], 3 * q[1] - 3, 1), end = new Date(q[0], 3 * q[1], 0);
+  const agents = new Set(cur.map(x => x.agent)).size;
+  const avgMin = cur.reduce((a, x) => a + x.minutes, 0) / cur.length;
+  const perConv = T.conv ? T.revenue / T.conv : 0;
+  const bySource = group(cur, x => x.source).sort((a, b) => b[1].rate - a[1].rate);
+  const byAgent = group(cur, x => x.agent).sort((a, b) => b[1].revenue - a[1].revenue);
+  const byRegion = group(cur, x => x.region).sort((a, b) => b[1].revenue - a[1].revenue);
+  const byProduct = group(cur, x => x.product).sort((a, b) => b[1].revenue - a[1].revenue);
+  const byMonth = group(cur, x => x.date.getMonth() + 1).sort((a, b) => a[0] - b[0]);
+  const pending = cur.filter(x => x.follow === "Pending");
+  const hot = pending.filter(x => ["Interested", "Callback Requested"].includes(x.status) && !x.converted);
+  const best = bySource[0], worst = bySource[bySource.length - 1], bestAgent = byAgent[0];
+  const topShare = T.revenue ? byAgent.slice(0, top).reduce((a, [, s]) => a + s.revenue, 0) / T.revenue * 100 : 0;
+  const B = [], H = t => B.push({ kind: "heading", mark: "□", text: t }), L = (m, t) => B.push({ kind: "bullet", mark: m, text: t });
+  const row = s => [n0(s.leads), n0(s.conv), pct(s.rate), won(s.revenue)];
+
+  H("실적 개요");
+  L("○", `(상담 건수) 총 **${n0(T.leads)}건**, 상담원 ${agents}명, 건당 평균 통화 ${avgMin.toFixed(1)}분`);
+  if (prev.length) L("-", `전 분기(${qName(pq)}) ${n0(P.leads)}건 대비 ${delta(T.leads, P.leads)}`);
+  L("○", `(전환 실적) **${n0(T.conv)}건 전환**, 전환율 **${pct(T.rate)}**`);
+  if (prev.length) L("-", `전 분기 전환율 ${pct(P.rate)} 대비 ${delta(T.rate, P.rate, "%p")}`);
+  L("○", `(매출) 총 **${won(T.revenue)}천**, 전환 1건당 평균 ${won(perConv)}천`);
+  if (prev.length) L("-", `전 분기 ${won(P.revenue)}천 대비 ${delta(T.revenue, P.revenue)}`);
+  B.push({ kind: "table", rows: [["구분", "상담", "전환", "전환율", "매출(천)"], ...byMonth.map(([m, s]) => [`${m}월`, ...row(s)]), ["계", ...row(T)]] });
+
+  H("유입경로별 전환 현황");
+  L("○", `전환율 최고는 **${ko(best[0])}**(${pct(best[1].rate)}), 최저는 ${ko(worst[0])}(${pct(worst[1].rate)})`);
+  L("-", `두 경로 간 전환율 차이 ${(best[1].rate - worst[1].rate).toFixed(1)}%p`);
+  B.push({ kind: "table", rows: [["유입경로", "상담", "전환", "전환율", "매출(천)"], ...bySource.map(([k, s]) => [ko(k), ...row(s)])] });
+
+  H("상담원별 실적");
+  L("○", `매출 1위 **${bestAgent[0]}**: 전환 ${bestAgent[1].conv}건, 매출 ${won(bestAgent[1].revenue)}천`);
+  L("-", `상위 ${top}명 매출 합계가 전체의 ${topShare.toFixed(1)}% 차지`);
+  B.push({ kind: "table", rows: [["순위", "상담원", "상담", "전환", "전환율", "매출(천)"], ...byAgent.slice(0, top).map(([k, s], i) => [String(i + 1), k, ...row(s)])] });
+
+  H("지역·상품별 매출");
+  L("○", "(지역) " + byRegion.map(([k, s]) => `${ko(k)} ${won(s.revenue)}천`).join(", "));
+  L("○", "(상품) 상위 3개 " + byProduct.slice(0, 3).map(([k, s]) => `${ko(k)} ${won(s.revenue)}천`).join(", "));
+
+  H("향후 조치");
+  L("○", `(후속 조치) 후속 연락 **대기 ${n0(pending.length)}건** 중 관심 표명·회신 요청 고객 **${n0(hot.length)}건** 우선 연락`);
+  L("○", `(유입경로) 전환율이 높은 ${ko(best[0])} 비중 확대, ${ko(worst[0])} 경로는 효과 점검`);
+  L("※", "금액 단위: 천(원본 엑셀의 Revenue Generated 기준)");
+
+  return { title: `${qName(q)} 상담 실적 현황 보고`, date: shortDate(new Date()), dept,
+    summary: `${qName(q)}(${ymd(start)}~${ymd(end).slice(5)}) 상담 리드 ${n0(T.leads)}건의 전환 실적과 유입경로·상담원별 성과를 분석하여 보고 드림`,
+    blocks: B };
+}
+
+// ── 화면 ─────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const draft = $("draft"), preview = $("preview"), parseErr = $("parseErr");
+let current = null, leads = null, timer = 0;
+const LS = "report-desk-draft";
+
+function refresh() {
+  try {
+    current = parseDraft(draft.value);
+    preview.innerHTML = renderPreview(current);
+    parseErr.hidden = true;
+  } catch (e) {
+    current = null;
+    parseErr.textContent = e.message;
+    parseErr.hidden = false;
+  }
+  $("saveDocx").disabled = !current;
+  $("saveTxt").disabled = !draft.value.trim();
+}
+function setDraft(text) { draft.value = text; refresh(); try { localStorage.setItem(LS, text); } catch {} }
+draft.addEventListener("input", () => {
+  clearTimeout(timer);
+  timer = setTimeout(() => { refresh(); try { localStorage.setItem(LS, draft.value); } catch {} }, 180);
+});
+$("sample").addEventListener("change", e => {
+  const v = e.target.value;
+  setDraft(v ? SAMPLES[v] : "제목: \n날짜: " + shortDate(new Date()) + "\n부서: " + $("dept").value + "\n\n□ \n○ \n");
+});
+
+// 엑셀
+function setStatus(el, msg, kind) { el.textContent = msg; el.className = "status" + (kind ? " " + kind : ""); }
+async function readExcel(file) {
+  const st = $("xlStatus");
+  if (!window.XLSX) return setStatus(st, "엑셀 읽기 도구를 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침하세요.", "err");
+  setStatus(st, `${file.name} 읽는 중… (행이 많으면 몇 초 걸립니다)`);
+  try {
+    const wb = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: true });
+    leads = loadLeads(wb);
+    const qs = [...new Map(leads.map(x => [qKey(x.q), x.q])).values()].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const sel = $("quarter");
+    sel.innerHTML = qs.map(q => `<option value="${qKey(q)}">${qName(q)} (${n0(leads.filter(x => qKey(x.q) === qKey(q)).length)}건)</option>`).join("");
+    sel.value = qKey(qs[qs.length - 1]);
+    sel.disabled = false; $("makeBtn").disabled = false;
+    setStatus(st, `${file.name} · ${n0(leads.length)}건 읽음 · 분기를 고르고 '초안 만들기'를 누르세요`, "ok");
+  } catch (e) {
+    leads = null; $("quarter").disabled = true; $("makeBtn").disabled = true;
+    setStatus(st, e.message, "err");
+  }
+}
+$("xl").addEventListener("change", e => { if (e.target.files[0]) readExcel(e.target.files[0]); });
+const drop = $("drop");
+["dragenter", "dragover"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("drag"); }));
+["dragleave", "drop"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove("drag"); }));
+drop.addEventListener("drop", e => { const f = e.dataTransfer.files[0]; if (f) readExcel(f); });
+$("makeBtn").addEventListener("click", () => {
+  if (!leads) return;
+  const [y, n] = $("quarter").value.split("-Q").map(Number);
+  try {
+    setDraft(dumpDraft(leadsReport(leads, [y, n], $("dept").value.trim())));
+    $("sample").value = "";
+    setStatus($("xlStatus"), `${qName([y, n])} 초안을 만들었습니다. 아래에서 문장을 고칠 수 있습니다.`, "ok");
+  } catch (e) { setStatus($("xlStatus"), e.message, "err"); }
+});
+
+// 저장
+const fileBase = () => (current?.title || "보고서").replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_");
+let downloads = null;
+(async () => {
+  try { downloads = await window.claude?.use?.("downloads"); } catch { downloads = null; }
+  if (!downloads) setStatus($("saveStatus"), "이 화면에서는 파일 저장을 쓸 수 없습니다. 초안 글을 복사해 두세요.", "err");
+})();
+async function offer(filename, data) {
+  const st = $("saveStatus");
+  if (!downloads) return setStatus(st, "이 화면에서는 파일 저장을 쓸 수 없습니다.", "err");
+  try {
+    const r = await downloads.save({ filename, data });
+    if (r?.status === "saved") setStatus(st, `${filename} 저장했습니다.`, "ok");
+    else setStatus(st, `${filename} 을(를) 보냈습니다.`, "ok");
+  } catch (e) {
+    const msg = { declined: "저장을 취소했습니다.", rate_limited: "저장 창이 이미 열려 있습니다. 잠시 뒤 다시 누르세요." }[e?.code]
+      || "이 화면에서는 저장할 수 없습니다.";
+    setStatus(st, msg, e?.code === "declined" ? "" : "err");
+  }
+}
+$("saveDocx").addEventListener("click", async () => {
+  if (!current) return;
+  if (!window.docx) return setStatus($("saveStatus"), "워드 만들기 도구를 불러오지 못했습니다. 새로고침하세요.", "err");
+  setStatus($("saveStatus"), "워드 파일을 만드는 중…");
+  try { offer(fileBase() + ".docx", await docx.Packer.toBlob(buildDocx(current))); }
+  catch (e) { setStatus($("saveStatus"), "워드 파일을 만들지 못했습니다: " + e.message, "err"); }
+});
+$("saveTxt").addEventListener("click", () => offer(fileBase() + ".txt", "﻿" + draft.value));
+
+// 시작: 지난번 쓰던 초안이 있으면 그것, 없으면 실적 예시
+let saved = null;
+try { saved = localStorage.getItem(LS); } catch {}
+draft.value = saved || SAMPLES["실적"];
+if (saved && saved !== SAMPLES["실적"]) $("sample").value = saved === SAMPLES["방문"] ? "방문" : "";
+refresh();
+</script>
